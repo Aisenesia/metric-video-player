@@ -1,0 +1,10 @@
+releases/
+*.mkv
+*.mp4
+*.avi
+*.mov
+*.flv
+*.webm
+target/
+Cargo.lock
+*.log

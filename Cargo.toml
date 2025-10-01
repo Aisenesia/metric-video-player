@@ -1,0 +1,63 @@
+[package]
+name = "metric-video-player"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance video player with FPS and performance metrics"
+authors = ["Hakan Keser <keser46h3@gmail.com>"]
+
+[dependencies]
+# Video processing - using vcpkg
+ffmpeg-next = "7.0"
+vcpkg = "0.2"
+
+
+# GUI Framework - using egui for immediate mode GUI
+# Force glow (OpenGL) backend instead of wgpu for better compatibility
+eframe = { version = "0.28", default-features = false, features = ["glow", "default_fonts"] }
+egui = "0.28"
+egui_extras = { version = "0.28", features = ["all_loaders"] }
+
+# Alternative: SDL2 for video display
+sdl2 = "0.37"
+
+# Performance monitoring
+sysinfo = "0.30"
+
+# CLI and argument parsing
+clap = { version = "4.4", features = ["derive"] }
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Timing and metrics
+instant = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Serialization for config and metrics export
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Image saving for debugging
+image = "0.25"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 1
+
+[[bin]]
+name = "metric-video-player"
+path = "src/main.rs"
