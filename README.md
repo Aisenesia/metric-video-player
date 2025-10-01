@@ -49,43 +49,52 @@ cargo build --release
 
 ## Usage
 
-### GUI Mode (Default)
+### GUI Mode (Default - SDL2)
 ```bash
-# Play video with GUI
-./target/release/metric-video-player --video-path path/to/video.mp4
+# Play video with SDL2 GUI (default)
+./target/release/metric-video-player -i path/to/video.mp4
 
 # Set target FPS
-./target/release/metric-video-player --video-path video.mp4 --target-fps 120
+./target/release/metric-video-player -i video.mp4 --target-fps 120
 
 # Export metrics to JSON
-./target/release/metric-video-player --video-path video.mp4 --export-metrics metrics.json
+./target/release/metric-video-player -i video.mp4 --export-metrics metrics.json
+
+# Use experimental egui GUI instead of SDL2
+./target/release/metric-video-player -i video.mp4 --egui
 ```
 
 ### CLI Mode
 ```bash
-# Play in terminal only
-./target/release/metric-video-player --video-path video.mp4 --gui false
+# Play in terminal only (no video display)
+./target/release/metric-video-player -i video.mp4 --gui false
 ```
 
 ### Benchmark Mode
 ```bash
 # Run performance benchmark (no GUI, maximum speed)
-./target/release/metric-video-player --video-path video.mp4 --benchmark
+./target/release/metric-video-player -i video.mp4 --benchmark
 ```
 
 ### Command Line Options
 
 ```
 Options:
-  -v, --video-path <VIDEO_PATH>          Path to the video file to play
+  -i, --video-path <VIDEO_PATH>          Path to the video file to play
   -t, --target-fps <TARGET_FPS>          Target FPS (0 = maximum possible) [default: 0]
   -g, --gui <GUI>                        Enable GUI mode [default: true]
   -e, --export-metrics <EXPORT_METRICS>  Export metrics to JSON file
-  -V, --verbose                          Enable verbose logging
+  -v, --verbose                          Enable verbose logging
   -b, --benchmark                        Run in benchmark mode (no GUI, just metrics)
+      --egui                             Use egui instead of SDL2 (experimental)
   -h, --help                             Print help
-  --sdl                                  Use sdl instead of egui (egui currently broken)
 ```
+
+### Controls (SDL2 GUI Mode)
+
+- **SPACE**: Pause/Resume playback
+- **ESC**: Quit application
+- **Window Title**: Shows current frame number and FPS metrics
 
 ## Output Examples
 
@@ -128,7 +137,8 @@ The application is built with performance in mind:
 
 - **FFmpeg Integration**: Uses the battle-tested FFmpeg library for video decoding
 - **Zero-copy Operations**: Minimizes memory allocations where possible
-- **Immediate Mode GUI**: Uses egui for responsive real-time interface
+- **SDL2 GUI**: Uses SDL2 for hardware-accelerated video rendering (default)
+- **Alternative GUI**: egui available with `--egui` flag (experimental, may have rendering issues)
 - **Async Processing**: Leverages Tokio for efficient I/O operations
 - **System Monitoring**: Uses platform-specific APIs for accurate resource monitoring
 

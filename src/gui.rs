@@ -57,7 +57,7 @@ impl MetricVideoPlayerApp {
         if should_advance {
             log::debug!("Advancing to next frame...");
             if let Ok(Some(frame)) = self.player.next_frame() {
-                log::info!("Got frame {}: {}x{}", frame.frame_number, frame.width, frame.height);
+                log::debug!("Got frame {}: {}x{}", frame.frame_number, frame.width, frame.height);
                 self.metrics.record_frame(frame.frame_number, &frame);
                 
                 // Save first frame to disk for debugging
@@ -164,9 +164,9 @@ impl eframe::App for MetricVideoPlayerApp {
             
             // Video display
             if let Some(texture) = &self.frame_texture {
-                log::info!("RENDER: Have texture, size: {:?}, ID: {:?}", texture.size_vec2(), texture.id());
+                log::debug!("RENDER: Have texture, size: {:?}, ID: {:?}", texture.size_vec2(), texture.id());
                 let available_size = ui.available_size();
-                log::info!("RENDER: Available UI size: {:?}", available_size);
+                log::debug!("RENDER: Available UI size: {:?}", available_size);
                 let texture_size = texture.size_vec2();
                 
                 // Test: Just draw a simple colored rectangle to see if rendering works
@@ -185,13 +185,13 @@ impl eframe::App for MetricVideoPlayerApp {
                 
                 // Calculate aspect ratio preserving size
                 let aspect_ratio = texture_size.x / texture_size.y;
-                log::info!("RENDER: Aspect ratio: {}", aspect_ratio);
+                log::debug!("RENDER: Aspect ratio: {}", aspect_ratio);
                 let display_size = if available_video_size.x / available_video_size.y > aspect_ratio {
                     egui::vec2(available_video_size.y * aspect_ratio, available_video_size.y)
                 } else {
                     egui::vec2(available_video_size.x, available_video_size.x / aspect_ratio)
                 };
-                log::info!("RENDER: Display size: {:?}", display_size);
+                log::debug!("RENDER: Display size: {:?}", display_size);
                 
                 // Center the video
                 ui.allocate_ui_with_layout(
@@ -199,10 +199,10 @@ impl eframe::App for MetricVideoPlayerApp {
                     egui::Layout::top_down(egui::Align::Center),
                     |ui| {
                         ui.add_space(10.0);
-                        log::info!("RENDER: About to add Image widget");
+                        log::debug!("RENDER: About to add Image widget");
                         // Try simpler image rendering
                         let response = ui.add(egui::Image::new(texture).fit_to_exact_size(display_size));
-                        log::info!("RENDER: Image widget added, response rect: {:?}", response.rect);
+                        log::debug!("RENDER: Image widget added, response rect: {:?}", response.rect);
                     },
                 );
             } else {

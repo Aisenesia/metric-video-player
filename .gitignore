@@ -8,3 +8,4 @@ releases/
 target/
 Cargo.lock
 *.log
+*.png

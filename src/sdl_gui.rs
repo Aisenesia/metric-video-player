@@ -96,6 +96,17 @@ pub fn run_sdl_gui(mut player: VideoPlayer, mut metrics: MetricsCollector, args:
 
                     last_frame_time = Instant::now();
 
+                    // Update window title with FPS every 30 frames
+                    if frame.frame_number % 30 == 0 {
+                        let title = format!(
+                            "Metric Video Player - Frame {} - FPS: {:.2} (avg: {:.2})",
+                            frame.frame_number,
+                            metrics.get_current_fps(),
+                            metrics.get_average_fps()
+                        );
+                        canvas.window_mut().set_title(&title).map_err(|e| anyhow::anyhow!("{}", e))?;
+                    }
+
                     if frame.frame_number % 100 == 0 {
                         log::info!(
                             "Frame {}: {:.2} FPS (avg: {:.2})",

@@ -27,9 +27,9 @@ pub struct Args {
     #[arg(short, long, default_value = "true")]
     pub gui: bool,
     
-    /// Use SDL2 for GUI instead of egui
+    /// Use egui instead of SDL2 for GUI (SDL2 is default due to better video rendering)
     #[arg(long)]
-    pub sdl: bool,
+    pub egui: bool,
     
     /// Export metrics to JSON file
     #[arg(short, long)]
@@ -85,14 +85,14 @@ async fn main() -> Result<()> {
             metrics.export_to_file(export_path)?;
         }
     } else if args.gui {
-        // Run with GUI
+        // Run with GUI - SDL2 is default for better video rendering
         info!("Starting GUI mode...");
-        if args.sdl {
+        if args.egui {
+            info!("Using egui for video display (experimental)...");
+            run_gui(player, metrics, args).await?;
+        } else {
             info!("Using SDL2 for video display...");
             sdl_gui::run_sdl_gui(player, metrics, args)?;
-        } else {
-            info!("Using egui for video display...");
-            run_gui(player, metrics, args).await?;
         }
     } else {
         // Run in CLI mode

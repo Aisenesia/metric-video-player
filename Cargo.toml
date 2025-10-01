@@ -8,7 +8,9 @@ authors = ["Hakan Keser <keser46h3@gmail.com>"]
 [dependencies]
 # Video processing - using vcpkg
 ffmpeg-next = "7.0"
+ffmpeg-sys-next = "7.0"
 vcpkg = "0.2"
+num_cpus = "1.16"
 
 
 # GUI Framework - using egui for immediate mode GUI

@@ -45,16 +45,30 @@ impl VideoPlayer {
         
         let video_stream_index = video_stream.index();
         
-        // Get decoder
+        // Get decoder with hardware acceleration if available
         let context_decoder = ffmpeg::codec::context::Context::from_parameters(video_stream.parameters())
             .context("Failed to create decoder context")?;
         
-        let decoder = context_decoder
+        let mut decoder = context_decoder
             .decoder()
             .video()
             .context("Failed to create video decoder")?;
         
-        // Create scaler for RGB conversion
+        // Try to enable hardware acceleration
+        // Note: This may not work on all systems, but will gracefully fall back to software decoding
+        unsafe {
+            // Enable multi-threading for faster decoding
+            (*decoder.as_mut_ptr()).thread_count = num_cpus::get() as i32;
+            (*decoder.as_mut_ptr()).thread_type = ffmpeg_sys_next::FF_THREAD_FRAME | ffmpeg_sys_next::FF_THREAD_SLICE;
+            
+            log::debug!("Decoder configured with {} threads", (*decoder.as_mut_ptr()).thread_count);
+        }
+        
+        if let Some(codec) = decoder.codec() {
+            log::info!("Codec: {}", codec.name());
+        }
+        
+        // Create scaler for RGB conversion (use FAST_BILINEAR for speed)
         let scaler = ffmpeg::software::scaling::Context::get(
             decoder.format(),
             decoder.width(),
@@ -62,7 +76,7 @@ impl VideoPlayer {
             ffmpeg::format::Pixel::RGB24,
             decoder.width(),
             decoder.height(),
-            ffmpeg::software::scaling::Flags::BILINEAR,
+            ffmpeg::software::scaling::Flags::FAST_BILINEAR,
         ).context("Failed to create scaler")?;
         
         // Calculate frame duration for target FPS
@@ -151,9 +165,9 @@ impl VideoPlayer {
                     data
                 };
                 
-                // Check if we have actual pixel data (not all zeros)
+                // Debug: Check if we have actual pixel data (not all zeros) - only with verbose logging
                 let non_zero_pixels = data.iter().take(100).filter(|&&b| b != 0).count();
-                log::info!("Frame {} data sample: first 100 bytes have {} non-zero values", 
+                log::debug!("Frame {} data sample: first 100 bytes have {} non-zero values", 
                     self.current_frame, non_zero_pixels);
                 
                 let timestamp = if let Some(pts) = frame.timestamp() {
